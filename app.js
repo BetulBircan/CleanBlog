@@ -1,7 +1,5 @@
 //Express i sayfaya ekleme
 const express = require('express');
-//statik dosyaları response olarak döndürmek için path modülünü app.js sayfasına dahil etme
-const path = require('path');
 
 //app değişkenşne express fonksiyonunu atama
 const app = express();
