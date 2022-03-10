@@ -23,11 +23,6 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.get('/index', (req, res) => {
-    //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/index' isteğine karşılık index.ejs dosyasını render ederiz.
-    res.render('index');
-  });
-
 app.get('/about', (req, res) => {
     //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/about' isteğine karşılık about.ejs dosyasını render ederiz.
     res.render('about');
