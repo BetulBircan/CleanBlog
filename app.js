@@ -2,8 +2,11 @@
 const express = require('express');
 //mongoose u kullanmak için app.js dosyasına ekliyoruz.
 const mongoose = require('mongoose');
-//ejs tempalte şablonunu kullanmak için ejs modülünü app.js sayfasına dahil etme
+//ejs template şablonunu kullanmak için ejs modülünü app.js sayfasına dahil etme
 const ejs = require('ejs');
+//Post modelini app.js dosyasında çağırma
+const Post = require('./models/Post');
+
 //app değişkenine express fonksiyonunu atama
 const app = express();
 
@@ -12,6 +15,7 @@ mongoose.connect('mongodb://localhost/cleanblog-test-db', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 
 /*EJS modülü template dosyaları görebilmek için varsayılan olarak views
  klasörünün içerisindeki .ejs uzantılı dosyalara bakar. Bu ne denle temp dosyamızın 
@@ -27,9 +31,13 @@ app.use(express.urlencoded({extended:true})) //url deki datayı okumamızı sağ
 app.use(express.json()) //url deki datayı json formatına dönüştürmemizi sağlar.
 
 //Routers
-app.get('/', (req, res) => {
+app.get('/',async  (req, res) => {
+ //veritabanına gönderilen postları  index.ejs dosyasında göstermek istiyoruz.
+ const posts = await Post.find({})
   //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasını render ederiz.
-  res.render('index');
+  res.render('index', {
+    posts
+  });
 });
 
 app.get('/about', (req, res) => {
@@ -42,9 +50,9 @@ app.get('/addpost', (req, res) => {
   res.render('add_post');
 });
 
-app.post('/post',  (req, res) => {
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/post' isteğine karşılık post.ejs dosyasını render ederiz.
-   console.log(req.body) 
+app.post('/post', async (req, res) => {
+  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasını render ederiz.
+  await Post.create(req.body) 
   res.redirect('/');
 });
 
