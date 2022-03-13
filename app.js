@@ -1,6 +1,7 @@
 //Express i sayfaya ekleme
 const express = require('express');
-
+//ejs tempalte şablonunu kullanmak için ejs modülünü app.js sayfasına dahil etme
+const ejs = require('ejs');
 //app değişkenşne express fonksiyonunu atama
 const app = express();
 
