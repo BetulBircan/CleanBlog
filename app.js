@@ -40,6 +40,17 @@ app.get('/',async  (req, res) => {
   });
 });
 
+//unique değer olan id özelliğini yakalayıp o id ye ait post için post.ejs dosyasını render etme
+app.get('/posts/:id', async (req, res) => {
+  //postun id sine göre listeleme
+  const post = await  Post.findById(req.params.id)
+  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/post' isteğine karşılık post.ejs dosyasını render ederiz.
+  //Burada post değişkenine gelen postun özelliklerini post.ejs dosyasına eklemiş oluyoruz.
+  res.render('post', {
+    post
+  })
+});
+
 app.get('/about', (req, res) => {
   //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/about' isteğine karşılık about.ejs dosyasını render ederiz.
   res.render('about');
