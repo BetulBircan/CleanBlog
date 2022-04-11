@@ -251,12 +251,59 @@ app.listen(port, () => {
         <hr>
         <% } %>
 ```
-**Sonucu**
 ![cleanblog](https://user-images.githubusercontent.com/86554799/158083438-3c9be738-6181-479a-856d-acc872618534.gif)
 
 ![cleanblogmongodb](https://user-images.githubusercontent.com/86554799/158083478-bd8952df-ad90-4b21-bc99-78716755df83.jpg)
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+## Projeden İstenilenler 3. Kısım
+- index.ejs içerisinde /posts/<%= posts[i]._id %> ile _id bilgisini gönderelim.
+- app.js içerisinde GET metoduyla "/posts/:id" ile gönderilen "_id" yi yakalayalım. .
+- tekil post bilgilerini post.ejs dosyasına gönderelim.
+- post.ejs içerisine post.title, post.detail ve post.dateCreated bilgilerini gönderelim. 
+## Proje Açıklaması
+- İlk istenileni gerçekleştirmek için yani bir postun kendisine ait olan id özelliğini yaklamak için index.ejs dosyasının içerisinde gerekş kod eklemesini yaptım.
 
+`
+<a href="/post/<%= posts[i]._id %>">
+`
+- Sonrasında bir postun üstüne tıkladığımızda o posta ait detayların olduğu bilgilerin gelmesi için app.js dosyasında get metoduyla postun kendisine ait olan id bilgisini yakaladım ve ve bunu post.ejs dosyasına yönlendirme işlemi yaptım.
 
+```
+/unique değer olan id özelliğini yakalayıp o id ye ait post için post.ejs dosyasını render etme
+app.get('/post/:id', async (req, res) => {
+  //postun id sine göre listeleme
+  // console.log(req.params.id)
+  const post = await Post.findById(req.params.id)
+   //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/post' isteğine karşılık post.ejs dosyasını render ederiz.
+   //Burada post değişkenine gelen postun özelliklerini post.ejs dosyasına eklemiş oluyoruz.
+  res.render('post', {
+    post
+  })
+});
+```
 
+- En sonunda da anasayfada listelenen postun üzerine tıkladığımızda post.ejs dosyasına post.title, post.detail ve post.dateCreated bilgilerini göndermek için gerekli düzenlemeleri kod içerisine yazdım.
+
+```
+ <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          
+            <h2 class="section-heading"><%= post.title %></h2>
+
+          <p><%= post.detail %></p>
+          <h2><%= post.dateCreated %></h2>
+      
+        </div>
+      </div>
+    </div>
+  </article>
+```
+**Sonucu**
+
+![cleanblogposts](https://user-images.githubusercontent.com/86554799/158464122-c4ad1d21-6c9e-451b-b747-6dd16337a29f.jpg)
+
+![cleanblogpost](https://user-images.githubusercontent.com/86554799/158464186-3791c7a6-9a01-458b-baf0-860e7f16afc2.jpg)
 
