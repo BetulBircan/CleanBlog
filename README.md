@@ -56,7 +56,7 @@ app.use(express.static('public'));  //index.html,css gibi statik dosyaları ekle
 ```
 - Sayfamızın dinamik bir şekilde çalışmasını yani içeriğinde değişiklikler yapmak istediğimizde template engine -şablon motoru- kullanılırız.Template engine bize  değişen içeriğin html kodu içerisinde dosya uzantısı değiştirilerek kullanmamızı sağlar. Template engineler sayesinde bir static dosyaları ve değieşn dinamik içeriği birlikte kullanabiliriz. Farklı template engineler kullanılabilir, fakat bu çalışmaada EJS template engine yapısını kullanacağım.
 - EJS, Embedded Java Script kelimelerinden oluşur ve bize saf Javascript kodları kullanmamıza imkan verirken aynı zamanda çalışmamıza ait değişen içerikleri de kullanabiliriz.
-- Bunun için de `npm i ejs` komutuyla ejs modülünü indirdim.Somrasında da 
+- Bunun için de `npm i ejs` komutuyla ejs modülünü indirdim.Sonrasında da 
 ```
 //Template Engine
 app.set('view engine', 'ejs');
@@ -216,7 +216,7 @@ app.get('/addpost', (req, res) => {
 });
 
 app.post('/post', async (req, res) => {
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasını render ederiz.
+  //Uygulamamızdaki .post metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasına yönlendiririz.
   await Post.create(req.body) 
   res.redirect('/');
 });
@@ -262,7 +262,7 @@ app.listen(port, () => {
 - tekil post bilgilerini post.ejs dosyasına gönderelim.
 - post.ejs içerisine post.title, post.detail ve post.dateCreated bilgilerini gönderelim. 
 ## Proje Açıklaması
-- İlk istenileni gerçekleştirmek için yani bir postun kendisine ait olan id özelliğini yaklamak için index.ejs dosyasının içerisinde gerekş kod eklemesini yaptım.
+- İlk istenileni gerçekleştirmek için yani bir postun kendisine ait olan id özelliğini yaklamak için index.ejs dosyasının içerisinde gerekli kod eklemesini yaptım.
 
 `
 <a href="/post/<%= posts[i]._id %>">
@@ -306,4 +306,256 @@ app.get('/post/:id', async (req, res) => {
 ![cleanblogposts](https://user-images.githubusercontent.com/86554799/158464122-c4ad1d21-6c9e-451b-b747-6dd16337a29f.jpg)
 
 ![cleanblogpost](https://user-images.githubusercontent.com/86554799/158464186-3791c7a6-9a01-458b-baf0-860e7f16afc2.jpg)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## Projeden İstenilenler 4. Kısım
+- post.ejs template içerisinde UPDATE ve DELETE butonu oluşturalım.
+- Herhangi bir post verisini güncellemek için gerekli çalışmaları yapalım.
+- Herhangi bir post verisini silmek için gerekli çalışmaları yapalım.
+- Kodumuzu MVC yapısına göre tekrar düzenleyelim.
+## Proje Açıklaması
+- İlk istenileni gerçekleştirmek için post.ejs template içerisine update ve delete butonu oluşturdum.
+
+```
+<div style="text-align:center">
+    <button class="btn btn-primary p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Update Details</span></button>
+    <button class="btn btn-danger p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Delete Post</span></button>
+</div>
+```
+- Daha sonra herhangi bir post verisini güncellemek için ilk önce edit.ejs template i oluşturdum.
+
+**edit.ejs**
+
+```
+<%- include('./partials/_header') -%>
+
+<body>
+
+    <%- include('./partials/_navigation') -%>
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('img/contact-bg.jpg')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="page-heading">
+            <h1>Edit The Post</h1>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <form method="POST" action="/post/<%= post._id %>?_method=PUT" novalidate>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Post Title</label>
+              <input type="text" name="title" value="<%= post.title %>" class="form-control" placeholder="Name" id="name" required>
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Post Detail</label>
+              <textarea rows="5" name="detail" class="form-control" placeholder="Message" id="message" required><%= post.detail %></textarea>
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <br>
+          <div id="success"></div>
+          <button type="submit" class="btn btn-primary" id="sendMessageButton">Update</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <%- include('./partials/_footer') -%>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Contact Form JavaScript -->
+  <script src="js/jqBootstrapValidation.js"></script>
+  <script src="js/contact_me.js"></script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
+
+```
+- edit.ejs şablonunu oluşturduktan sonra app.js dosyasında get ve post yönlendirmelerini yaptım.
+- **Not:** Çoğu tarayıcılar put ve delete requestini desteklemedikleri için post isteği gibi simüle etmemiz gerekli. Bunun için de method-override modülünden faydalandım. `npm i method-override` diyerek modülü kurdum ve daha sonra da app.js dosyasına dahil ettim.
+
+**app.js**
+```
+//put ve delete metodunu post metodu gibi işlev görmesi için app.js dosyasında çağırma
+const methodOverride = require('method-override'); 
+
+app.use(methodOverride('_method')); //burada Put yani güncelleme işlemini Post olarak simüle etme middleware olarak ekledim.
+
+//Router-Yönlendirme kısmı
+
+//Post güncellemesi işlemi burada yapılır
+//get request ile edit.ejs sayfasına yani post bilgileri güncelleme sayfasına yönlendirme
+app.get('/post/edit/:id', async (req, res) => {
+  const post = await Post.findOne({ _id: req.params.id });
+  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/photos/edit/:id isteğine karşılık edit.ejs dosyasını render ederiz.
+  res.render('edit', {
+    post,
+  });
+});
+
+//put requesti ile post verilerini güncelleme
+app.put('/post/:id', async (req, res) => {
+  const post = await Post.findOne({ _id: req.params.id });
+  post.title = req.body.title;
+  post.detail = req.body.detail;
+  post.save();
+
+  res.redirect(`/post/${req.params.id}`)
+});
+
+```
+- En sonunda post.ejs dosyasında button etiketini a etiketi ile değiştirerek güncelleme sayfasına yönlendirmesini sağladım böylece post güncelleme işlemini tamamlamış oldum.
+
+**post.ejs**
+
+`<a href="/post/edit/<%=post._id%>" class="btn btn-primary p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Update Details</span></a>`
+
+**Sonuc**
+
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/86554799/163037208-b10b451b-47a5-405c-8032-49db840947de.gif)
+
+![cleanblogupdate](https://user-images.githubusercontent.com/86554799/163043526-e7ca5dbe-0830-4afc-a8b6-744fefac75da.jpg)
+
+- Daha sonra herhangi bir postu silmek için ilk olarak silme işlemini yaparken herhangi bir forma gerek olmadığı için post.ejs dosyasına aşağıdaki kodu DELETE PHOTO butonuna link olarak ekledim.
+
+**post.ejs**
+
+` <a href="/post/<%= post._id %>?_method=DELETE" class="btn btn-danger p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Delete Post</span></a>`
+
+- Sonrasında app.js dosyasında delete metodu ile silme için gerekli işlemleri yaptım.
+
+**app.js**
+
+```
+//midleware ekleme
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+); //burada delete yani silme işlemi için post olarak simüle etme ve get isteği yapma
+
+//delete requesti ile fotoğrafı silme
+app.delete('/post/:id', async (req, res) => {
+  await Post.findByIdAndRemove(req.params.id);
+  res.redirect('/')
+});
+
+```
+
+- En sonunda da silmeden önce sorması için bir popup eklemek istedim ve post.ejs dosyasında a etiketine onclick olayına confirm ekledim böylece silme işlemi tamamlanmış oldu.
+
+```
+<a href="/post/<%= post._id %>?_method=DELETE" class="btn btn-danger p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"
+          onclick="confirm('Are you sure you want to delete this post?')"><span>Delete Post</span></a>
+```
+
+- Son işlem olarak projede yönlendirmeler kısmında tek bir sayfada gerçekleşmemesi yani app.js dosyasının şişmemesi için projeyi mvc yapısına uygun hale getirme işlemini gerçekleştirdim. Bunun içinse ilk olarak controller adında bir dosya oluşturdum ve daha sonra da Post modelinden faydalanarak yaptığım get, post, put ve delete işlemlerini gerçekleştirmek için postController.js dosyası oluşturdum ve gerekli işlemleri yaptım.
+
+**controllers/postController.js**
+
+```
+//Post ile ilgili gelen isteklere karşı yönlendirmeler burada yapılır.
+
+const Post = require('../models/Post'); //model dosyası içerisinde photo modelini çağırma
+
+//Bütün Postlar burada listelenir.
+exports.getAllPosts = async  (req, res) => {
+    //veritabanına gönderilen postları  index.ejs dosyasında göstermek istiyoruz.
+    const posts = await Post.find({});
+     //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasını render ederiz.
+     res.render('index', {
+       posts
+     });
+   }
+
+//Tekil post sayfası burada oluşturulur.unique değer olan id özelliğini yakalayıp o id ye ait post için post.ejs dosyasını render etme
+exports.getPost = async (req, res) => {
+    //postun id sine göre listeleme
+    // console.log(req.params.id)
+    const post = await Post.findById(req.params.id)
+     //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/post' isteğine karşılık post.ejs dosyasını render ederiz.
+     //Burada post değişkenine gelen postun özelliklerini post.ejs dosyasına eklemiş oluyoruz.
+    res.render('post', {
+      post
+    })
+  }
+
+//Yeni bir post ekleme işlemi burada yapılır
+exports.createPost = async (req, res) => {
+  
+    await Post.create(req.body) 
+    res.redirect('/');
+  }
+
+//Post Güncelleme işlemi burada yapılır.
+exports.updatePost = async (req, res) => {
+    const post = await Post.findOne({ _id: req.params.id });
+    post.title = req.body.title;
+    post.detail = req.body.detail;
+    post.save();
+  
+    res.redirect(`/post/${req.params.id}`)
+  }
+
+//Post silme işlemi burada yapılır
+exports.deletePost = async (req, res) => {
+    await Post.findByIdAndRemove(req.params.id);
+    res.redirect('/')
+  }
+
+```
+
+- Daha sonra app.js dosyasında da gerekli düzenlemeleri oluşturdum.
+
+**app.js**
+
+```
+//postController dosyasını app.js dpsyasında çağırma
+const postController = require('./controllers/postController')
+
+//Routers
+app.get('/',postController.getAllPosts); //Bütün postları göstermek için
+app.get('/post/:id', postController.getPost ); //tek bir postu göstermek için
+app.post('/post', postController.createPost); //yeni bir post eklemek için
+app.put('/post/:id', postController.updatePost); //put requesti ile post verilerini güncelleme
+app.delete('/post/:id', postController.deletePost); //delete requesti ile fotoğrafı silme
+
+```
+
+- En sonunda başka sayfalara yönlendirme yapmaları için yaptığım istekleri pageController.js dosyası oluşturdum ve burada topladım. Sonrasında app.js dosyasında da gerekli düzeltmeleri yaparak projeyi mvc(model-view-controller) yapısına uyarlamış oldum.
+
+**pageController.js**
+
+``````
+
+**app.js**
+
+``````
+
+
+
 
