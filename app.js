@@ -32,6 +32,11 @@ app.use(express.static('public')); //index.html,css gibi statik dosyaları eklem
 app.use(express.urlencoded({extended:true})) //url deki datayı okumamızı sağlar
 app.use(express.json()) //url deki datayı json formatına dönüştürmemizi sağlar.
 app.use(methodOverride('_method')); //burada Put yani güncelleme işlemini Post olarak simüle etme
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+); //burada delete yani silme işlemi için post olarak simüle etme ve get isteği yapma
 
 //Routers
 app.get('/',async  (req, res) => {
@@ -89,6 +94,13 @@ app.put('/post/:id', async (req, res) => {
   post.save();
 
   res.redirect(`/post/${req.params.id}`)
+});
+
+//Post silme işlemi burada yapılır
+//delete requesti ile fotoğrafı silme
+app.delete('/post/:id', async (req, res) => {
+  await Post.findByIdAndRemove(req.params.id);
+  res.redirect('/')
 });
 
 //Port numarası tanımlama ve o port üzerinden sunucuyu başlatma

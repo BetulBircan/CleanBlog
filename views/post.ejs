@@ -42,7 +42,8 @@
       </div>
       <div style="text-align:center">
         <a href="/post/edit/<%=post._id%>" class="btn btn-primary p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Update Details</span></a>
-        <button class="btn btn-danger p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"><span>Delete Post</span></button>
+        <a href="/post/<%= post._id %>?_method=DELETE" class="btn btn-danger p-4 ml-10 tm-btn-animate tm-btn-download tm-icon-download"
+          onclick="confirm('Are you sure you want to delete this post?')"><span>Delete Post</span></a>
 			</div>
     </div>
   </article>
