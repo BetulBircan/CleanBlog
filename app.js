@@ -8,6 +8,8 @@ const ejs = require('ejs');
 const methodOverride = require('method-override'); 
 //Post modelini app.js dosyasında çağırma
 const Post = require('./models/Post');
+//postController dosyasını app.js dpsyasında çağırma
+const postController = require('./controllers/postController')
 
 //app değişkenine express fonksiyonunu atama
 const app = express();
@@ -39,14 +41,12 @@ app.use(
 ); //burada delete yani silme işlemi için post olarak simüle etme ve get isteği yapma
 
 //Routers
-app.get('/',async  (req, res) => {
- //veritabanına gönderilen postları  index.ejs dosyasında göstermek istiyoruz.
- const posts = await Post.find({});
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/' isteğine karşılık index.ejs dosyasını render ederiz.
-  res.render('index', {
-    posts
-  });
-});
+app.get('/',postController.getAllPosts); //Bütün postları göstermek için
+app.get('/post/:id', postController.getPost ); //tek bir postu göstermek için
+app.post('/post', postController.createPost); //yeni bir post eklemek için
+app.put('/post/:id', postController.updatePost); //put requesti ile post verilerini güncelleme
+app.delete('/post/:id', postController.deletePost); //delete requesti ile fotoğrafı silme
+
 
 app.get('/about', (req, res) => {
   //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/about' isteğine karşılık about.ejs dosyasını render ederiz.
@@ -58,23 +58,10 @@ app.get('/addpost', (req, res) => {
   res.render('add_post');
 });
 
-app.post('/post', async (req, res) => {
-  
-  await Post.create(req.body) 
-  res.redirect('/');
-});
 
-//unique değer olan id özelliğini yakalayıp o id ye ait post için post.ejs dosyasını render etme
-app.get('/post/:id', async (req, res) => {
-  //postun id sine göre listeleme
-  // console.log(req.params.id)
-  const post = await Post.findById(req.params.id)
-   //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/post' isteğine karşılık post.ejs dosyasını render ederiz.
-   //Burada post değişkenine gelen postun özelliklerini post.ejs dosyasına eklemiş oluyoruz.
-  res.render('post', {
-    post
-  })
-});
+
+
+
 
 //Post güncellemesi işlemi burada yapılır
 //get request ile edit.ejs sayfasına yani post bilgileri güncelleme sayfasına yönlendirme
@@ -86,22 +73,11 @@ app.get('/post/edit/:id', async (req, res) => {
   });
 });
 
-//put requesti ile post verilerini güncelleme
-app.put('/post/:id', async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id });
-  post.title = req.body.title;
-  post.detail = req.body.detail;
-  post.save();
 
-  res.redirect(`/post/${req.params.id}`)
-});
 
-//Post silme işlemi burada yapılır
-//delete requesti ile fotoğrafı silme
-app.delete('/post/:id', async (req, res) => {
-  await Post.findByIdAndRemove(req.params.id);
-  res.redirect('/')
-});
+
+
+
 
 //Port numarası tanımlama ve o port üzerinden sunucuyu başlatma
 const port = 3300;
