@@ -8,8 +8,10 @@ const ejs = require('ejs');
 const methodOverride = require('method-override'); 
 //Post modelini app.js dosyasında çağırma
 const Post = require('./models/Post');
-//postController dosyasını app.js dpsyasında çağırma
+//postController dosyasını app.js dosyasında çağırma
 const postController = require('./controllers/postController')
+//pageController dosyasını app.js dosyasında çağırma
+const pageController = require('./controllers/pageController')
 
 //app değişkenine express fonksiyonunu atama
 const app = express();
@@ -47,37 +49,9 @@ app.post('/post', postController.createPost); //yeni bir post eklemek için
 app.put('/post/:id', postController.updatePost); //put requesti ile post verilerini güncelleme
 app.delete('/post/:id', postController.deletePost); //delete requesti ile fotoğrafı silme
 
-
-app.get('/about', (req, res) => {
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/about' isteğine karşılık about.ejs dosyasını render ederiz.
-  res.render('about');
-});
-
-app.get('/addpost', (req, res) => {
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/addpost' isteğine karşılık add_post.ejs dosyasını render ederiz.
-  res.render('add_post');
-});
-
-
-
-
-
-
-//Post güncellemesi işlemi burada yapılır
-//get request ile edit.ejs sayfasına yani post bilgileri güncelleme sayfasına yönlendirme
-app.get('/post/edit/:id', async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id });
-  //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/photos/edit/:id isteğine karşılık edit.ejs dosyasını render ederiz.
-  res.render('edit', {
-    post,
-  });
-});
-
-
-
-
-
-
+app.get('/about', pageController.getAboutPage); //about sayfasına yönlendirme
+app.get('/addpost', pageController.getAddPage ); //add new post saygfasına yönlendirme
+app.get('/post/edit/:id', pageController.getEditPage); //get request ile edit.ejs sayfasına yani post bilgileri güncelleme sayfasına yönlendirme
 
 //Port numarası tanımlama ve o port üzerinden sunucuyu başlatma
 const port = 3300;
