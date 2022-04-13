@@ -465,7 +465,6 @@ app.delete('/post/:id', async (req, res) => {
 });
 
 ```
-
 - En sonunda da silmeden önce sorması için bir popup eklemek istedim ve post.ejs dosyasında a etiketine onclick olayına confirm ekledim böylece silme işlemi tamamlanmış oldu.
 
 ```
@@ -473,7 +472,31 @@ app.delete('/post/:id', async (req, res) => {
           onclick="confirm('Are you sure you want to delete this post?')"><span>Delete Post</span></a>
 ```
 
-- Son işlem olarak projede yönlendirmeler kısmında tek bir sayfada gerçekleşmemesi yani app.js dosyasının şişmemesi için projeyi mvc yapısına uygun hale getirme işlemini gerçekleştirdim. Bunun içinse ilk olarak controller adında bir dosya oluşturdum ve daha sonra da Post modelinden faydalanarak yaptığım get, post, put ve delete işlemlerini gerçekleştirmek için postController.js dosyası oluşturdum ve gerekli işlemleri yaptım.
+**Sonuc**
+
+![postsilme](https://user-images.githubusercontent.com/86554799/163184028-f0132798-8fd8-49a0-bb67-fcf56ea91d8d.gif)
+
+![mongodbdelete](https://user-images.githubusercontent.com/86554799/163184155-5407b7cf-d87b-4ee0-9164-ce2e6a3f0438.jpg)
+
+- Bu zamana kadar aslında projede tüm yönlendirmeleri ve bu yönlendirmelere karşılık yapılan işlemlerin tamamını app.js dosyası içerisinde yapmışıtm. Açıkcası bu projede şimdiye kadar bir sorun çıkmış değil ancak özellikle büyük ölçekli projelerin yönetimi ve hata yakalaması açısında kodu işlevsel açıdan farklı dosyalara bölmek işleri kolaylaştırır. Bu yüzden son işlem olarak MVC(Model-View-Controller) yapısını oluşturdum.
+
+**MVC Nedir?**
+
+MVC - Model View Controller - uygulama kodunu Model, View ve Controller olmak üzere birbirine bağlı üç öğeye ayrılmasını içeren bir yazılım mimari yapısıdır.
+
+**Model**
+
+Uygulamanın veri yapısını ve veri tabanı ile ilişkisini tanımlar. Schema "şablon" yapısı sayesinde veri özellikleri belirlenir.
+
+**View**
+
+Uygulamanın son kullanıcılara görünen bölümünü temsil eder. Son kullanıcıya gösterilecek veri özelleştirilebilir.
+
+**Controller**
+
+Son kullanıcıdan gelen isteklerin uygun View'e yönlendirilmesi kontrol edilir. İstek, cevap işleyicisi olarak da tanımlanır.
+
+- Bu yapıyı oluşturmak için de projeye controllers adında bir klasör oluşturdum ve oluşturduğum Post modeli ile ilişkili olan yönlendirmeleri bir araya toplayabilmek için postController.js dosyasını oluşturudm ve gerekli fonkisyonları yazıp app.js dosyasında da gerekli düzenlemeleri yaptım.
 
 **controllers/postController.js**
 
@@ -550,11 +573,41 @@ app.delete('/post/:id', postController.deletePost); //delete requesti ile fotoğ
 
 **pageController.js**
 
-``````
+```
+//About, Add New Post ve Post güncellemesi için oluşturulan edit.ejs sayfalarına yönlendirme işlemleri burada yapılır.
+
+const Post = require('../models/Post') //model dosyası içerisinde Post modelini çağırma
+
+//About yani hakkımızda sayfasına yönlendirmeyle ilgili işlemler burada yapılır.
+exports.getAboutPage =  (req, res) => {
+    //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/about' isteğine karşılık about.ejs dosyasını render ederiz.
+    res.render('about');
+  }
+
+//Add yani post ekleme sayfasına yönlendirmeyle ilgili işlemler burada yapılır.
+exports.getAddPage = (req, res) => {
+    //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/addpost' isteğine karşılık add_post.ejs dosyasını render ederiz.
+    res.render('add_post');
+  }
+
+//Post güncellemesi için oluşturulan edit.ejs dosyasına yönledirme işlemleri burada yapılır.
+exports.getEditPage = async (req, res) => {
+    const post = await Post.findOne({ _id: req.params.id });
+    //Uygulamamızdaki .get metodunu düzenlersek, bu şekilde '/photos/edit/:id isteğine karşılık edit.ejs dosyasını render ederiz.
+    res.render('edit', {
+      post,
+    });
+  }
+```
 
 **app.js**
 
-``````
+```
+app.get('/about', pageController.getAboutPage); //about sayfasına yönlendirme
+app.get('/addpost', pageController.getAddPage ); //add new post saygfasına yönlendirme
+app.get('/post/edit/:id', pageController.getEditPage); //get request ile edit.ejs sayfasına yani post bilgileri güncelleme sayfasına yönlendirme
+
+```
 
 
 
