@@ -1,7 +1,7 @@
 # Clean Blog Projesi
 ## Projeden İstenilenler 1.Kısım
 
-Clean Blog projesini farklı ödevlere ayırarak yapmaya çalışacağız. Bu ödevimizde yapılması gerekenler:
+Clean Blog projesini farklı bölümlere ayırarak yapmaya çalışacağız. Bu projede yapılması gerekenler:
 
 - CleanBlog proje klasörünü oluşturalım.
 - Package.json dosyasını oluşturalım.
